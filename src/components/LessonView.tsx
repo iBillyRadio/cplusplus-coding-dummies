@@ -311,7 +311,7 @@ export const LessonView: React.FC<LessonViewProps> = ({ lesson, onComplete }) =>
                             </button>
 
                             <button
-                                onClick={() => setCode(stage.codeTemplate)}
+                                onClick={() => setCode(interpolateSolution(stage.codeTemplate, { ...activeVariants, ...validationContext }))}
                                 className="px-4 py-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors flex items-center gap-2"
                             >
                                 <RotateCcw size={16} /> Reset Code
