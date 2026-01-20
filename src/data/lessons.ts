@@ -188,8 +188,8 @@ export const lessons: Lesson[] = [
     concept: 'The Cycle',
     description: "Algorithms often require visiting every item or repeating until done.",
     intro: {
-      story: "Don't repeat yourself (DRY). If you need to do something 100 times, don't write 100 lines of code. Write a loop. `for` loops are for when you know how many times, `while` loops are for when you don't.",
-      exampleCode: "for(int i=0; i<5; i++) {\n  cout << \"Repetition is key\";\n}",
+      story: "Don't repeat yourself (DRY). If you need to do something 100 times, don't write 100 lines of code. Write a loop.\n\nUse `for` when you know the count.\nUse `while` when you don't.",
+      exampleCode: "// 1. For Loop (Count to 5)\nfor(int i=0; i<5; i++) {\n  cout << i << \" \";\n}\n\n// 2. While Loop (Run until done)\nwhile(fuel > 0) {\n  drive();\n  fuel--;\n}",
       efficiencyTip: "Prefix increment `++i` is slightly preferred over `i++` in complex C++ iterators, but for simple integers, the compiler optimizes them to be identical."
     },
     previewCode: "for (int i = 0; i < 5; i++) {\n  cout << i;\n}",
@@ -224,8 +224,8 @@ export const lessons: Lesson[] = [
     concept: 'The Switch',
     description: "Handling complex choices and guaranteed execution loops.",
     intro: {
-      story: "Sometimes an `if/else` chain gets too messy. A `switch` is like a vending machine selection panel—clean and direct. And `do-while`? That's for when you definitely want to do something at least once, like checking a password.",
-      exampleCode: "switch(direction) {\n  case 1: goNorth(); break;\n  case 2: goSouth(); break;\n}",
+      story: "Sometimes an `if/else` chain gets too messy. A `switch` is cleaner for specific values.\n\nA `do-while` loop is special: it always runs at least once before checking the condition.",
+      exampleCode: "// 1. Switch (Cleaner if/else)\nswitch(choice) {\n  case 1: play(); break;\n  case 2: quit(); break;\n  default: cout << \"Invalid\";\n}\n\n// 2. Do-While (Run at least once)\ndo {\n  input = readKey();\n} while (input != 'x');",
     },
     previewCode: "switch(choice) {\n  case 1: play(); break;\n  case 2: quit(); break;\n}",
     stages: [
