@@ -92,10 +92,10 @@ export const lessons: Lesson[] = [
         instruction: "Create a `{{targetType}}` variable with **any name you want** and set it to an initial value.",
         codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  // Create variable\n  \n  return 0;\n}",
         // Regex to match: type name = value;
-        // Allows for int x=10; double y = 5.5; string s = "Hello";
+        // Allows for int x=10; double y = -5.5; string s = "Hello";
         // Captures 'varName'
-        // We match type exactly, but allow any value (numeric or string)
-        solution: 'regex:{{targetType}}\\s+(?<varName>\\w+)\\s*=\\s*(?:[\\d\\.]+|"[^"]*")\\s*;',
+        // We match type exactly, but allow any value (numeric (including negative) or string)
+        solution: 'regex:{{targetType}}\\s+(?<varName>\\w+)\\s*=\\s*(?:-?[\\d\\.]+|"[^"]*")\\s*;',
         hint: "Follow the pattern: `{{targetType}} name = value;` e.g. `{{targetType}} myVar = ...;`"
       },
       {
@@ -106,7 +106,7 @@ export const lessons: Lesson[] = [
         // We accept different values based on type? 
         // For simplicity, let's just use a regex that accepts any value assignment to that specific varName (numeric or string literal).
         // Matches: name = 50;  or name = "Updated";
-        solution: 'regex:{{varName}}\\s*=\\s*(?:[\\d\\.]+|"[^"]*")\\s*;',
+        solution: 'regex:{{varName}}\\s*=\\s*(?:-?[\\d\\.]+|"[^"]*")\\s*;',
         hint: "Just use `{{varName}} = new_value;`."
       },
       {
