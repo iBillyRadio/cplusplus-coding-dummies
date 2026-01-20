@@ -24,6 +24,12 @@ export interface Lesson {
   module: ModuleType;
   concept: string;
   description: string;
+  intro: {
+    story: string;       // Modern/Layman explanation
+    exampleCode: string; // Muscle memory code block
+    efficiencyTip?: string; // Optional Big O / STL tip
+  };
+  variants?: Record<string, string[]>; // Context variables for randomization
   previewCode?: string; // Code snippet to demonstrate validity
   stages: Stage[];
 }
@@ -35,6 +41,11 @@ export const lessons: Lesson[] = [
     module: 'PG1',
     concept: 'The Voice',
     description: "Computers are silent until we give them a voice. In C++, we use `cout` to speak.",
+    intro: {
+      story: "Imagine your program is a mute robot. It might be doing genius calculations, but unless it speaks, you'll never know. `cout` (Reference: Character Output) is how you hand the robot a microphone.",
+      exampleCode: "cout << \"I can speak!\";",
+      efficiencyTip: "Printing to screen is actually slow (relatively speaking)! In competitive programming, we use `\\n` instead of `endl` because `endl` forces a 'flush' which takes extra time."
+    },
     previewCode: "cout << \"Hello World\";",
     stages: [
       {
@@ -66,28 +77,44 @@ export const lessons: Lesson[] = [
     module: 'PG1',
     concept: 'The Box',
     description: "Variables are named storage containers. C++ is 'strongly typed', meaning specific boxes for specific shapes.",
+    intro: {
+      story: "You have a lot of stuff to store. You wouldn't put soup in a cardboard box, right? C++ is strict about this. `int` is for whole numbers, `double` is for decimals, and `string` is for text. Pick the right box for the job.",
+      exampleCode: "int health = 100;\nstring hero = \"Geralt\";",
+      efficiencyTip: "Choosing the smallest type used to matter for memory (like `short` vs `int`), but nowadays for standard logical variables, just use `int`. Processors are optimized for it."
+    },
+    variants: {
+      targetType: ['int', 'double', 'string'],
+    },
     previewCode: "int score = 10;\ndouble price = 4.99;\nstring name = \"Player\";",
     stages: [
       {
         step: 1,
-        instruction: "Create an integer box named `xp` and give it value 0.",
-        codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  // Create xp\n  \n  return 0;\n}",
-        solution: "int xp = 0;",
-        hint: "`int name = value;`"
+        instruction: "Create a `{{targetType}}` variable with **any name you want** and set it to a standard value (0, 0.0, or empty string).",
+        codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  // Create {{targetType}} variable\n  \n  return 0;\n}",
+        // Regex to match: type name = value;
+        // Allows for int x=0; int x = 0; etc.
+        // Captures 'varName'
+        // For string, we accept "" (empty string).
+        solution: 'regex:{{targetType}}\\s+(?<varName>\\w+)\\s*=\\s*(?:0|0\\.0|"");',
+        hint: "Follow the pattern: `type name = value;` e.g. `int xp = 0;`"
       },
       {
         step: 2,
-        instruction: "Now update `xp` to be 50. Do not redeclare it, just assign it.",
-        codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  int xp = 0;\n  // Set xp to 50\n  \n  return 0;\n}",
-        solution: "xp = 50;",
-        hint: "Just use `name = new_value;`."
+        instruction: "Now update your `{{targetType}}` variable `{{varName}}` to be a new value (50, 50.5, or \"Updated\").",
+        codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  {{targetType}} {{varName}} = ...;\n  // Update {{varName}}\n  \n  return 0;\n}",
+        // Context validation: we expect the exact varName they used before.
+        // We accept different values based on type? 
+        // For simplicity, let's just use a regex that accepts any value assignment to that specific varName (numeric or string literal).
+        // Matches: name = 50;  or name = "Updated";
+        solution: 'regex:(?:context:){{varName}}\\s*=\\s*(?:50|50\\.5|"[^"]*");',
+        hint: "Just use `{{varName}} = new_value;`."
       },
       {
         step: 3,
-        instruction: "Create a double (decimal) named `modifier` with value 1.5.",
-        codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  // Create modifier\n  \n  return 0;\n}",
-        solution: "double modifier = 1.5;",
-        hint: "`double` is used for 1.5, 3.14, etc."
+        instruction: "Output your variable `{{varName}}` using `cout`.",
+        codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  // Print {{varName}}\n  \n  return 0;\n}",
+        solution: 'context:cout << {{varName}};',
+        hint: "`cout << {{varName}};`"
       }
     ]
   },
@@ -97,6 +124,11 @@ export const lessons: Lesson[] = [
     module: 'PG1',
     concept: 'The Ear',
     description: "Programs need to listen. `cin` allows us to take input from the keyboard to variables.",
+    intro: {
+      story: "A conversation is a two-way street. `cin` (Character Input) is the ear of your program. It pauses the Matrix and waits for the user to type something. The arrows `>>` point WHERE the data goes.",
+      exampleCode: "int age;\ncin >> age;",
+      efficiencyTip: "When taking huge amounts of input (like 100,000 numbers), turn off 'unsync with stdio' to make C++ input faster than Python or Java."
+    },
     previewCode: "int age;\ncin >> age;",
     stages: [
       {
@@ -128,6 +160,11 @@ export const lessons: Lesson[] = [
     module: 'PG1',
     concept: 'The Fork',
     description: "Data comes down the wire and logic decides where it goes.",
+    intro: {
+      story: "Life is full of choices. 'If' I have money, I buy pizza. 'Else', I eat leftovers. Your code needs to make these same decisions. We use `if`, `else`, and logic gates like `&&` (AND) and `||` (OR).",
+      exampleCode: "if (hasKey) {\n  openDoor();\n} else {\n  cout << \"Locked\";\n}",
+      efficiencyTip: "Order matters! In `if (A && B)`, if A is false, the computer doesn't even bother checking B. Put the cheapest or mostly-likely-to-fail check first."
+    },
     previewCode: "if (score > 100) {\n  cout << \"Win\";\n} else {\n  cout << \"Try Again\";\n}",
     stages: [
       {
@@ -159,6 +196,11 @@ export const lessons: Lesson[] = [
     module: 'PG1',
     concept: 'The Cycle',
     description: "Algorithms often require visiting every item or repeating until done.",
+    intro: {
+      story: "Don't repeat yourself (DRY). If you need to do something 100 times, don't write 100 lines of code. Write a loop. `for` loops are for when you know how many times, `while` loops are for when you don't.",
+      exampleCode: "for(int i=0; i<5; i++) {\n  cout << \"Repetition is key\";\n}",
+      efficiencyTip: "Prefix increment `++i` is slightly preferred over `i++` in complex C++ iterators, but for simple integers, the compiler optimizes them to be identical."
+    },
     previewCode: "for (int i = 0; i < 5; i++) {\n  cout << i;\n}",
     stages: [
       {
@@ -190,6 +232,10 @@ export const lessons: Lesson[] = [
     module: 'PG1',
     concept: 'The Switch',
     description: "Handling complex choices and guaranteed execution loops.",
+    intro: {
+      story: "Sometimes an `if/else` chain gets too messy. A `switch` is like a vending machine selection panel—clean and direct. And `do-while`? That's for when you definitely want to do something at least once, like checking a password.",
+      exampleCode: "switch(direction) {\n  case 1: goNorth(); break;\n  case 2: goSouth(); break;\n}",
+    },
     previewCode: "switch(choice) {\n  case 1: play(); break;\n  case 2: quit(); break;\n}",
     stages: [
       {
@@ -227,6 +273,11 @@ export const lessons: Lesson[] = [
     module: 'PG1',
     concept: 'The Shelf',
     description: "Resizing arrays. Essential for LeetCode dynamic problems.",
+    intro: {
+      story: "Old-school arrays are rigid; you set the size and you're stuck. `std::vector` is a magic backpack that grows as you shove more stuff into it. It's the most used container in modern C++.",
+      exampleCode: "vector<int> nums = {1, 2, 3};\nnums.push_back(4); // Now it has 4 elements!",
+      efficiencyTip: "Vectors prefer to be contiguous in memory. This makes them CPU cache-friendly and extremely fast to iterate over compared to lists."
+    },
     previewCode: "vector<int> nums = {1, 2, 3};\ncout << nums[0];",
     stages: [
       {
@@ -265,6 +316,10 @@ export const lessons: Lesson[] = [
     module: 'PG1',
     concept: 'The Recipe',
     description: "Breaking big problems into small, testable chunks.",
+    intro: {
+      story: "A 1000-line main function is a nightmare. Functions let you package code into reusable 'spells'. You define the spell once, give it a name, and cast it whenever you need it.",
+      exampleCode: "int heal(int hp) {\n  return hp + 10;\n}\n\n// Usage: hp = heal(hp);",
+    },
     previewCode: "void sayHi() {\n  cout << \"Hi\";\n}\nusing namespace std;\n\nint main() {\n  sayHi();\n  return 0;\n}",
     stages: [
       {
@@ -304,6 +359,10 @@ export const lessons: Lesson[] = [
     module: 'PG1',
     concept: 'The Link',
     description: "Scope, References, and Globals. Control exactly what your function can see and touch.",
+    intro: {
+      story: "Variables have a 'territory'. A local variable lives in its function and dies when the function ends. A Reference (`&`) is a tunnel to a variable outside the function, letting you change the original.",
+      exampleCode: "void swap(int& a, int& b) {\n  int t = a; a = b; b = t;\n}",
+    },
     previewCode: "void update(int &score) {\n  score += 10; // Changes original\n}",
     stages: [
       {
@@ -335,6 +394,10 @@ export const lessons: Lesson[] = [
     module: 'PG1',
     concept: 'The Chain',
     description: "Text processing is the core of many algorithms(Palindromes, Anagrams).",
+    intro: {
+      story: "Strings are just fancy arrays of characters. They can be added together (`+`), sliced (`substr`), and searched. Mastering strings is mastering communication.",
+      exampleCode: "string s = \"Loading...\";\ns += \" Done\";",
+    },
     previewCode: "string s = \"Hello\";\ncout << s.length();",
     stages: [
       {
@@ -369,6 +432,11 @@ export const lessons: Lesson[] = [
     module: 'DSA',
     concept: 'The Dictionary',
     description: "O(1) lookups. The secret weapon for 50% of interview questions (Two Sum, Frequency Count).",
+    intro: {
+      story: "A dictionary connects a word (Key) to a definition (Value). A Map does exactly the same. You give it a magic key, and it instantly gives you the stored value, no matter how much data you have.",
+      exampleCode: "map<string, int> scores;\nscores[\"Player1\"] = 9000;",
+      efficiencyTip: "`unordered_map` is O(1) mostly, while `map` is O(log n). If order doesn't matter, use `unordered_map` for speed."
+    },
     previewCode: "map<string, int> scores;\nscores[\"Player1\"] = 100;",
     stages: [
       {
@@ -408,6 +476,11 @@ export const lessons: Lesson[] = [
     module: 'PG1',
     concept: 'The Bundle',
     description: "Grouping related variables together. The precursor to Classes.",
+    intro: {
+      story: "Instead of carrying a sword, a shield, and a potion separately, put them all in an 'Inventory' bag. A Struct groups variables under one name to keep things organized.",
+      exampleCode: "struct Player {\n  string name;\n  int hp;\n};",
+      efficiencyTip: "Structs are just classes where everything is 'public' by default."
+    },
     previewCode: "struct Point {\n  int x;\n  int y;\n};",
     stages: [
       {
@@ -445,6 +518,11 @@ export const lessons: Lesson[] = [
     module: 'PG2',
     concept: 'The Blueprint',
     description: "Custom data structures. Essential for Linked Lists and Trees.",
+    intro: {
+      story: "Structs are just for data. Classes are for data + behavior. A 'Car' class doesn't just have 'fuel', it also has 'drive()'. This is the blueprint for creating objects.",
+      exampleCode: "class Car {\n  void drive() {\n    cout << \"Vroom\";\n  }\n};",
+      efficiencyTip: "Keep your data private and your functions public. This is called Encapsulation."
+    },
     previewCode: "class Cat {\npublic:\n  void meow() {\n    cout << \"Meow\";\n  }\n};",
     stages: [
       {
@@ -479,6 +557,11 @@ export const lessons: Lesson[] = [
     module: 'PG2',
     concept: 'The Compass',
     description: "Variables store data, pointers store where that data lives.",
+    intro: {
+      story: "A pointer is not the house; it's the address of the house written on a piece of paper. If you follow the address, you find the house. Using pointers, we can share massive objects without copying them.",
+      exampleCode: "int money = 100;\nint* ptr = &money;\n*ptr = 200; // Changes money to 200",
+      efficiencyTip: "Dereferencing a pointer is fast, but chasing a long chain of pointers (pointer chasing) can cause cache misses."
+    },
     previewCode: "int x = 10;\nint* ptr = &x;\n*ptr = 20;",
     stages: [
       {
@@ -510,6 +593,11 @@ export const lessons: Lesson[] = [
     module: 'PG2',
     concept: 'The Heap',
     description: "Allocating memory manually allows for flexible storage that outlives functions.",
+    intro: {
+      story: "Sometimes you don't know how much memory you need until the program runs. The 'Heap' is a giant free store of memory. You ask for a chunk (`new`), use it, and then give it back (`delete`).",
+      exampleCode: "int* bigData = new int[1000];\n// ... use it ...\ndelete[] bigData;",
+      efficiencyTip: "Forgetting to `delete` causes Memory Leaks. Modern C++ uses `unique_ptr` and `shared_ptr` to handle this automatically."
+    },
     previewCode: "int* p = new int(5);\ndelete p;",
     stages: [
       {
@@ -544,6 +632,11 @@ export const lessons: Lesson[] = [
     module: 'PG2',
     concept: 'The Vault',
     description: "Protecting your data. Use getters, setters, and destructors.",
+    intro: {
+      story: "You wouldn't let a stranger reach into your wallet. You hand them cash. Classes are similar: variables are private (the wallet), and methods are public (handing cash). This protects data from being messed up.",
+      exampleCode: "class Bank {\n  private: int balance;\n  public: void deposit(int amt) {\n    balance += amt;\n  }\n};",
+    },
+
     previewCode: "class Bank {\nprivate:\n  int balance;\npublic:\n  int getBalance() { return balance; }\n};",
     stages: [
       {
@@ -578,6 +671,12 @@ export const lessons: Lesson[] = [
     module: 'PG2',
     concept: 'The Hierarchy',
     description: "Don't reinvent the wheel. Extend existing classes to build powerful hierarchies.",
+    intro: {
+      story: "A 'Dog' IS-A 'Animal'. It gets all the Animal features for free, but adds barking. Inheritance lets you build on top of what exists without copy-pasting code.",
+      exampleCode: "class Dog : public Animal {\n  void speak() override {\n    cout << \"Woof\";\n  }\n};",
+      efficiencyTip: "Virtual functions add a tiny bit of overhead (vtable lookup) but are essential for polymorphism."
+    },
+
     previewCode: "class Dog : public Animal {\n  void speak() override {\n    cout << \"Woof\";\n  }\n};",
     stages: [
       {
@@ -608,7 +707,12 @@ export const lessons: Lesson[] = [
     title: 'Abstract Classes',
     module: 'SYSTEMS',
     concept: 'The Contract',
+
     description: "Interfaces allow us to define WHAT something does without defining HOW. Essential for large systems.",
+    intro: {
+      story: "A 'Shape' is an abstract idea. You can't draw just 'a Shape'; you draw a Circle or a Square. Abstract classes define the required methods (the contract), but leave the details to the specific children.",
+      exampleCode: "class Shape {\n  virtual void draw() = 0; // Pure Virtual\n};",
+    },
     previewCode: "class Shape {\n  virtual void draw() = 0;\n};",
     stages: [
       {
@@ -640,6 +744,10 @@ export const lessons: Lesson[] = [
     module: 'SYSTEMS',
     concept: 'The Safety Net',
     description: "Things break. Good robust code anticipates failure and handles it gracefully.",
+    intro: {
+      story: "Sometimes things go wrong—files don't exist, internet goes down. Exceptions allow your program to scream 'HELP!' and jump to a safety net (`catch` block) instead of crashing immediately.",
+      exampleCode: "try {\n  openFile(\"ghost.txt\");\n} catch (exception& e) {\n  cout << \"File needed!\";\n}",
+    },
     previewCode: "try {\n  if (fail) throw 500;\n} catch (int e) {\n  cout << \"Error \" << e;\n}",
     stages: [
       {
@@ -671,6 +779,10 @@ export const lessons: Lesson[] = [
     module: 'SYSTEMS',
     concept: 'The Stack & Heap',
     description: "Understanding where variables live is crucial for performance and avoiding crashes.",
+    intro: {
+      story: "The Stack is like a pile of plates—fast, easy, but small. The Heap is like a giant warehouse—huge, but you have to drive there to get stuff. Local variables go on the Stack; `new` goes on the Heap.",
+      exampleCode: "int stackVar = 10; // Fast\nint* heapVar = new int(10); // Manual",
+    },
     previewCode: "int stackVar = 10;\nint* heapVar = new int(10);",
     stages: [
       {
@@ -702,6 +814,10 @@ export const lessons: Lesson[] = [
     module: 'SYSTEMS',
     concept: 'Persistence',
     description: "Data lost when the program ends is useless. Save it to files.",
+    intro: {
+      story: "RAM is amnesiac; it forgets everything when the power goes out. Files are the long-term memory. Reading and writing text files is how you make your data survive a reboot.",
+      exampleCode: "ofstream save(\"game.txt\");\nsave << \"Score: 100\";",
+    },
     previewCode: "ofstream file(\"save.txt\");\nfile << \"Game Saved\";",
     stages: [
       {
@@ -736,6 +852,11 @@ export const lessons: Lesson[] = [
     module: 'DSA',
     concept: 'Efficiency',
     description: "Measuring how code slows down as data grows. O(1) is instant, O(n) is linear.",
+    intro: {
+      story: "If you have 10 friends, finding one takes 10 seconds. If you have 1,000,000, does it take 1,000,000 seconds? Big O notation measures how your algorithm 'scales up' as the work gets harder.",
+      exampleCode: "// O(n) - Linear\nfor (int i = 0; i < n; i++) { ... }",
+      efficiencyTip: "Memorize: O(1) < O(log n) < O(n) < O(n log n) < O(n^2) < O(2^n)."
+    },
     previewCode: "for(int i=0; i<n; i++) { ... } // O(n)",
     stages: [
       {
@@ -770,6 +891,10 @@ export const lessons: Lesson[] = [
     module: 'DSA',
     concept: 'The Chain',
     description: "Nodes linked together. Dynamic size, but O(n) access. The hello world of data structures.",
+    intro: {
+      story: "Arrays are neighbors in a long apartment block. Linked Lists are a scavenger hunt: each item holding the address to the next one. Great for adding/removing items, terrible for jumping to the 5th item instantly.",
+      exampleCode: "Node* head = new Node(1);\nhead->next = new Node(2);",
+    },
     previewCode: "struct Node {\n  int val;\n  Node* next;\n};",
     stages: [
       {
@@ -801,6 +926,11 @@ export const lessons: Lesson[] = [
     module: 'DSA',
     concept: 'Order from Chaos',
     description: "Organizing data makes searching faster. Bubble sort is easiest, `sort` is fastest.",
+    intro: {
+      story: "It's hard to find a name in a shuffled phone book. Sorting organizes data so we can find things instantly. `std::sort` is a highly optimized mix of QuickSort, HeapSort, and InsertionSort.",
+      exampleCode: "vector<int> v = {3, 1, 2};\nsort(v.begin(), v.end()); // {1, 2, 3}",
+      efficiencyTip: "Never write your own sort in a real app. `std::sort` is O(n log n) and beaten by almost nothing manually written."
+    },
     previewCode: "sort(v.begin(), v.end());",
     stages: [
       {
@@ -835,6 +965,10 @@ export const lessons: Lesson[] = [
     module: 'DSA',
     concept: 'The Hierarchy',
     description: "Hierarchical data. Binary Search Trees (BST) allow fast O(log n) lookups.",
+    intro: {
+      story: "Filesystems, HTML DOMs, and Organization Charts are all Trees. A root node branches into children. In a BST, everything smaller is on the left, everything larger is on the right.",
+      exampleCode: "if (val < root->val) goLeft();\nelse goRight();",
+    },
     previewCode: "struct Node {\n  int val;\n  Node* left;\n  Node* right;\n};",
     stages: [
       {
@@ -866,6 +1000,10 @@ export const lessons: Lesson[] = [
     module: 'SE',
     concept: 'The Detective',
     description: "Code rarely works the first time. Reading error messages and fixing logic is 90% of the job.",
+    intro: {
+      story: "Programming is 10% writing code and 90% figuring out why it doesn't work. Debugging is the art of acting like a detective in a crime movie where you are also the murderer.",
+      exampleCode: "cout << \"DEBUG: x is \" << x << endl;",
+    },
     previewCode: "// Error: missing semicolon\nint x = 5",
     stages: [
       {
@@ -897,6 +1035,10 @@ export const lessons: Lesson[] = [
     module: 'SE',
     concept: 'The Guard',
     description: "Prove your code works. Write assertions that fail if the code is wrong.",
+    intro: {
+      story: "Don't just 'hope' it works. Prove it. Tests are safety rails. They ensure that when you fix a bug today, you don't accidentally break something else tomorrow.",
+      exampleCode: "assert(add(2, 2) == 4);\n// Crashes if false",
+    },
     previewCode: "assert(add(2, 2) == 4);",
     stages: [
       {
@@ -928,6 +1070,10 @@ export const lessons: Lesson[] = [
     module: 'SE',
     concept: 'The Cleanup',
     description: "Make code cleaner without changing what it does. Rename variables to be descriptive.",
+    intro: {
+      story: "Your code works, but it looks like a mess. Refactoring is cleaning up the kitchen after cooking. You aren't making new food, just organizing so the next person (or you in 6 months) doesn't scream.",
+      exampleCode: "// Before\nint x = 86400;\n// After\nint secondsInDay = 86400;",
+    },
     previewCode: "// Bad\nint x = 5;\n// Good\nint score = 5;",
     stages: [
       {
@@ -959,6 +1105,10 @@ export const lessons: Lesson[] = [
     module: 'INTERVIEW',
     concept: 'The Unique Collection',
     description: "Keep only unique items. 'set' is sorted (O(log n)), 'unordered_set' is fast (O(1)).",
+    intro: {
+      story: "A Club Guest List where everyone can only enter once. If you try to add 'John' twice, the Set says 'He's already here' and does nothing. Perfect for deduplication.",
+      exampleCode: "set<int> present;\npresent.insert(1);\npresent.insert(1); // Ignored",
+    },
     previewCode: "set<int> s;\\ns.insert(1);\\nif (s.count(1)) found();",
     stages: [
       {
@@ -990,6 +1140,10 @@ export const lessons: Lesson[] = [
     module: 'INTERVIEW',
     concept: 'Order Matters',
     description: "LIFO (Stack) for backtracking/parsing. FIFO (Queue) for scheduling/BFS.",
+    intro: {
+      story: "A Stack is a stack of pancakes (eat the top one first). A Queue is a line at the DMV (first come, first served). Simple rules, but they power everything from browser history to printer jobs.",
+      exampleCode: "stack.push(1); stack.pop(); // LIFO\nqueue.push(1); queue.pop(); // FIFO",
+    },
     previewCode: "stack<int> s;\\ns.push(1);\\nint top = s.top(); s.pop();",
     stages: [
       {
@@ -1021,6 +1175,10 @@ export const lessons: Lesson[] = [
     module: 'INTERVIEW',
     concept: 'The Mirror',
     description: "A function that calls itself. The key to Trees, Graphs, and Dynamic Programming.",
+    intro: {
+      story: "To understand recursion, you must first understand recursion. It's a function that calls itself to solve a smaller version of the problem, until it hits a simple 'Base Case'.",
+      exampleCode: "void dive(int depth) {\n  if (depth == 0) return;\n  dive(depth - 1);\n}",
+    },
     previewCode: "int fact(int n) {\\n  if (n <= 1) return 1;\\n  return n * fact(n-1);\\n}",
     stages: [
       {
@@ -1052,6 +1210,10 @@ export const lessons: Lesson[] = [
     module: 'INTERVIEW',
     concept: 'The Divider',
     description: "Don't scan the whole list. Cut it in half every time. O(log n).",
+    intro: {
+      story: "Guess a number between 1 and 100. '50?' 'Higher.' '75?' 'Lower.' You just eliminated half the possibilities. That's Binary Search. It searches billions of items in mere steps.",
+      exampleCode: "while (L <= R) {\n  mid = L + (R-L)/2;\n  if (arr[mid] < target) L = mid + 1;\n}",
+    },
     previewCode: "int mid = L + (R - L) / 2;\\nif (arr[mid] < target) L = mid + 1;",
     stages: [
       {
@@ -1083,6 +1245,10 @@ export const lessons: Lesson[] = [
     module: 'INTERVIEW',
     concept: 'The Explorer',
     description: "How to visit every node in a maze (Graph/Tree). BFS uses Queue, DFS uses Stack/Recursion.",
+    intro: {
+      story: "BFS works like water spreading out evenly (level by level). DFS works like a maze runner going as deep as possible before backtracking. Use BFS for 'Shortest Path'.",
+      exampleCode: "queue<int> q;\nq.push(start);\nwhile (!q.empty()) { ... }",
+    },
     previewCode: "queue<int> q; q.push(start);\\nwhile (!q.empty()) { ... }",
     stages: [
       {

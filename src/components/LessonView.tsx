@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Play, RotateCcw, Check, X, CheckCircle } from 'lucide-react';
 import type { Lesson } from '../data/lessons';
 import { Editor } from './Editor';
-import { normalizeCode } from '../utils/validation';
+import { LessonIntro } from './LessonIntro';
+import { normalizeCode, checkAndCapture, interpolateSolution } from '../utils/validation';
 
 interface LessonViewProps {
     lesson: Lesson;
@@ -11,53 +12,119 @@ interface LessonViewProps {
 
 export const LessonView: React.FC<LessonViewProps> = ({ lesson, onComplete }) => {
     const [currentStageIndex, setCurrentStageIndex] = useState(0);
+    const [showIntro, setShowIntro] = useState(false);
     const [code, setCode] = useState('');
     const [feedback, setFeedback] = useState<{ type: 'success' | 'error' | 'idle'; message: string }>({ type: 'idle', message: '' });
     const [attempts, setAttempts] = useState(0);
 
+    // Flexible Validation State
+    const [validationContext, setValidationContext] = useState<Record<string, string>>({});
+    const [activeVariants, setActiveVariants] = useState<Record<string, string>>({});
+
     const stage = lesson.stages[currentStageIndex];
 
-    // Reset when lesson changes
+    // Reset or Restore when lesson changes
     useEffect(() => {
-        setCurrentStageIndex(0);
-        setCode(lesson.stages[0].codeTemplate);
+        const savedStage = localStorage.getItem(`lesson_stage_${lesson.id}`);
+        let initialStage = 0;
+
+        if (savedStage) {
+            const parsed = parseInt(savedStage, 10);
+            if (!isNaN(parsed) && parsed >= 0 && parsed < lesson.stages.length) {
+                initialStage = parsed;
+            }
+        }
+
+        setCurrentStageIndex(initialStage);
+
+        // Show intro if we are at the beginning and the lesson has one
+        setShowIntro(initialStage === 0 && !!lesson.intro);
+
+        // Initialize Variants (Randomization)
+        let currentVariants: Record<string, string> = {};
+        if (lesson.variants) {
+            for (const key in lesson.variants) {
+                const options = lesson.variants[key];
+                currentVariants[key] = options[Math.floor(Math.random() * options.length)];
+            }
+            setActiveVariants(currentVariants);
+            // Also reset context on new lesson
+            setValidationContext(currentVariants);
+        } else {
+            setActiveVariants({});
+            setValidationContext({});
+        }
+
+        // Resolve template with current context/variants logic immediately for initial render
+        const rawTemplate = lesson.stages[initialStage].codeTemplate;
+        const resolvedTemplate = interpolateSolution(rawTemplate, currentVariants);
+        setCode(resolvedTemplate);
+
         setFeedback({ type: 'idle', message: '' });
         setAttempts(0);
     }, [lesson]);
 
+    if (showIntro && lesson.intro) {
+        return <LessonIntro lesson={lesson} onStart={() => setShowIntro(false)} />;
+    }
+
+    // Save progress
+    useEffect(() => {
+        localStorage.setItem(`lesson_stage_${lesson.id}`, currentStageIndex.toString());
+    }, [currentStageIndex, lesson.id]);
+
     // Reset when stage changes
     useEffect(() => {
         if (stage) {
-            setCode(stage.codeTemplate);
+            // Resolve template with current context/variants
+            const resolvedTemplate = interpolateSolution(stage.codeTemplate, { ...activeVariants, ...validationContext });
+            setCode(resolvedTemplate);
             setFeedback({ type: 'idle', message: '' });
             setAttempts(0);
         }
-    }, [stage]);
+    }, [stage, activeVariants]); // Add activeVariants dep to ensure it's ready
 
     const checkCode = () => {
         // Robust normalization using the utility
         const normalizedCode = normalizeCode(code);
 
         const solutions = Array.isArray(stage.solution) ? stage.solution : [stage.solution];
+
+        let capturedInThisCheck: Record<string, string> = {};
+
         const isCorrect = solutions.some(sol => {
-            if (sol.startsWith('regex:')) {
+            // 1. Interpolate the solution template with current Context + Variants
+            // e.g. "context:{{targetType}} {{myVar}} = 50;" -> "int xp = 50;"
+            const resolvedSol = interpolateSolution(sol, { ...activeVariants, ...validationContext });
+
+            if (resolvedSol.startsWith('regex:')) {
                 // Regex validation mode
-                try {
-                    const pattern = new RegExp(sol.substring(6));
-                    // Check against raw code (maybe slightly trimmed) to allow pattern matching
-                    return pattern.test(code.trim());
-                } catch (e) {
-                    console.error("Invalid regex in solution:", sol);
-                    return false;
+                // Remove 'regex:' prefix
+                const regexPattern = resolvedSol.substring(6);
+                const { isMatch, captured } = checkAndCapture(code, regexPattern);
+
+                if (isMatch && captured) {
+                    // Temporarily store captured vars from this successful match
+                    capturedInThisCheck = { ...capturedInThisCheck, ...captured };
                 }
+                return isMatch;
+            } else if (resolvedSol.startsWith('context:')) {
+                // Context mode (deprecated prefix? no, keeping it for clarity in data, but logic is same as normal check after interpolation)
+                // Remove 'context:' prefix
+                const cleanSol = resolvedSol.substring(8);
+                return normalizedCode.includes(normalizeCode(cleanSol));
             } else {
                 // Standard normalized string match
-                return normalizedCode.includes(normalizeCode(sol));
+                return normalizedCode.includes(normalizeCode(resolvedSol));
             }
         });
 
         // Check if the solution is contained within the code
         if (isCorrect) {
+            // Commit captured variables to state
+            if (Object.keys(capturedInThisCheck).length > 0) {
+                setValidationContext(prev => ({ ...prev, ...capturedInThisCheck }));
+            }
             setFeedback({ type: 'success', message: 'Correct! Great job.' });
         } else {
             const nextAttempts = attempts + 1;
@@ -120,7 +187,10 @@ export const LessonView: React.FC<LessonViewProps> = ({ lesson, onComplete }) =>
                         <div className="flex items-center gap-2 mb-4">
                             <span className="text-xs font-bold uppercase tracking-wider bg-zinc-900 border border-zinc-700 text-white px-2 py-1 rounded">Step {stage.step}</span>
                         </div>
-                        <p className="text-lg leading-relaxed text-white font-medium" style={{ color: '#ffffff' }}>{stage.instruction}</p>
+                        {/* Dynamic Instruction Rendering */}
+                        <p className="text-lg leading-relaxed text-white font-medium" style={{ color: '#ffffff' }}>
+                            {interpolateSolution(stage.instruction, { ...activeVariants, ...validationContext })}
+                        </p>
                     </div>
 
                     {/* Card 2: Preview & Unlock Status (Black Slide) */}
@@ -197,13 +267,43 @@ export const LessonView: React.FC<LessonViewProps> = ({ lesson, onComplete }) =>
                     <Editor code={code} onChange={setCode} />
 
                     <div className="flex justify-end gap-3" style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                        <button
-                            onClick={() => setCode(stage.codeTemplate)}
-                            className="px-4 py-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors flex items-center gap-2"
-                            style={{ padding: '8px 16px', borderRadius: '8px', background: 'transparent', border: 'none', color: '#a1a1aa', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
-                        >
-                            <RotateCcw size={16} /> Reset
-                        </button>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => {
+                                    if (window.confirm("Restart lesson? This will reset your progress.")) {
+                                        setCurrentStageIndex(0);
+                                        setShowIntro(!!lesson.intro);
+                                        setFeedback({ type: 'idle', message: '' });
+                                        setAttempts(0);
+                                        setValidationContext({});
+                                        // Re-roll variants?
+                                        if (lesson.variants) {
+                                            const newVariants: Record<string, string> = {};
+                                            for (const key in lesson.variants) {
+                                                const options = lesson.variants[key];
+                                                newVariants[key] = options[Math.floor(Math.random() * options.length)];
+                                            }
+                                            setActiveVariants(newVariants);
+                                            setValidationContext(newVariants);
+                                            // Update initial code too? The useEffect depends on 'lesson' which didn't change...
+                                            // We manually update code here based on stage 0 and new variants
+                                            setCode(interpolateSolution(lesson.stages[0].codeTemplate, newVariants));
+                                        }
+                                    }
+                                }}
+                                className="px-4 py-2 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800 transition-colors flex items-center gap-2"
+                                title="Restart Lesson"
+                            >
+                                <RotateCcw size={16} /> <span className="hidden md:inline">Restart</span>
+                            </button>
+
+                            <button
+                                onClick={() => setCode(stage.codeTemplate)}
+                                className="px-4 py-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors flex items-center gap-2"
+                            >
+                                <RotateCcw size={16} /> Reset Code
+                            </button>
+                        </div>
 
                         {feedback.type === 'success' ? (
                             <button
