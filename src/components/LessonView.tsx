@@ -22,6 +22,16 @@ export const LessonView: React.FC<LessonViewProps> = ({ lesson, onComplete }) =>
 
     // Flexible Validation State - Initialize lazily to ensure it's available on first render
     const [activeVariants, setActiveVariants] = useState<Record<string, string>>(() => {
+        // Try to load from localStorage first
+        const saved = localStorage.getItem(`lesson_variants_${lesson.id}`);
+        if (saved) {
+            try {
+                return JSON.parse(saved);
+            } catch (e) {
+                console.error("Failed to parse saved variants", e);
+            }
+        }
+
         if (lesson.variants) {
             const variants: Record<string, string> = {};
             for (const key in lesson.variants) {
@@ -33,8 +43,33 @@ export const LessonView: React.FC<LessonViewProps> = ({ lesson, onComplete }) =>
         return {};
     });
 
-    // Also Initialize context with variants immediately
-    const [validationContext, setValidationContext] = useState<Record<string, string>>(activeVariants);
+    // Initialize context with variants immediately, restoring from storage if available
+    const [validationContext, setValidationContext] = useState<Record<string, string>>(() => {
+        const saved = localStorage.getItem(`lesson_context_${lesson.id}`);
+        if (saved) {
+            try {
+                return { ...activeVariants, ...JSON.parse(saved) }; // Merge activeVariants just in case
+            } catch (e) {
+                console.error("Failed to parse saved context", e);
+            }
+        }
+        return activeVariants;
+    });
+
+    // Effect to persist variants
+    useEffect(() => {
+        if (Object.keys(activeVariants).length > 0) {
+            localStorage.setItem(`lesson_variants_${lesson.id}`, JSON.stringify(activeVariants));
+        }
+    }, [activeVariants, lesson.id]);
+
+    // Effect to persist context
+    useEffect(() => {
+        if (Object.keys(validationContext).length > 0) {
+            localStorage.setItem(`lesson_context_${lesson.id}`, JSON.stringify(validationContext));
+        }
+    }, [validationContext, lesson.id]);
+
 
     const stage = lesson.stages[currentStageIndex];
 
@@ -290,6 +325,9 @@ export const LessonView: React.FC<LessonViewProps> = ({ lesson, onComplete }) =>
                                         setFeedback({ type: 'idle', message: '' });
                                         setAttempts(0);
                                         setValidationContext({});
+                                        localStorage.removeItem(`lesson_stage_${lesson.id}`);
+                                        localStorage.removeItem(`lesson_variants_${lesson.id}`);
+                                        localStorage.removeItem(`lesson_context_${lesson.id}`);
                                         // Re-roll variants?
                                         if (lesson.variants) {
                                             const newVariants: Record<string, string> = {};
