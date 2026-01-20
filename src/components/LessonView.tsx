@@ -89,7 +89,10 @@ export const LessonView: React.FC<LessonViewProps> = ({ lesson, onComplete }) =>
             setFeedback({ type: 'idle', message: '' });
             setAttempts(0);
         }
-    }, [stage, activeVariants, validationContext]);
+        // CRITICAL FIX: Do NOT include validationContext here. 
+        // Updating context (on success) should NOT trigger a stage reset.
+        // Only reset when the STAGE (index) changes.
+    }, [currentStageIndex, activeVariants]);
 
     if (showIntro && lesson.intro) {
         return <LessonIntro lesson={lesson} onStart={() => setShowIntro(false)} />;
