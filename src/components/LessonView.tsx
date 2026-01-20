@@ -281,7 +281,7 @@ export const LessonView: React.FC<LessonViewProps> = ({ lesson, onComplete }) =>
                         <div className="flex gap-2">
                             <button
                                 onClick={() => {
-                                    if (window.confirm("Restart lesson? This will reset your progress.")) {
+                                    if (window.confirm("Restart module? This will reset your progress.")) {
                                         setCurrentStageIndex(0);
                                         setShowIntro(!!lesson.intro);
                                         setFeedback({ type: 'idle', message: '' });
@@ -305,7 +305,7 @@ export const LessonView: React.FC<LessonViewProps> = ({ lesson, onComplete }) =>
                                 className="px-4 py-2 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800 transition-colors flex items-center gap-2"
                                 title="Restart Lesson"
                             >
-                                <RotateCcw size={16} /> <span className="hidden md:inline">Restart</span>
+                                <RotateCcw size={16} /> <span className="hidden md:inline">Restart Module</span>
                             </button>
 
                             <button
