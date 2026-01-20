@@ -16,8 +16,6 @@ export const LessonView: React.FC<LessonViewProps> = ({ lesson, onComplete }) =>
     }
     const [currentStageIndex, setCurrentStageIndex] = useState(0);
     const [showIntro, setShowIntro] = useState(false);
-    const [currentStageIndex, setCurrentStageIndex] = useState(0);
-    const [showIntro, setShowIntro] = useState(false);
     // code state moved to lazy init below
     const [feedback, setFeedback] = useState<{ type: 'success' | 'error' | 'idle'; message: string }>({ type: 'idle', message: '' });
     const [attempts, setAttempts] = useState(0);
