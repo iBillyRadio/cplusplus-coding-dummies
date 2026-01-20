@@ -64,10 +64,6 @@ export const LessonView: React.FC<LessonViewProps> = ({ lesson, onComplete }) =>
         setAttempts(0);
     }, [lesson]);
 
-    if (showIntro && lesson.intro) {
-        return <LessonIntro lesson={lesson} onStart={() => setShowIntro(false)} />;
-    }
-
     // Save progress
     useEffect(() => {
         localStorage.setItem(`lesson_stage_${lesson.id}`, currentStageIndex.toString());
@@ -83,6 +79,10 @@ export const LessonView: React.FC<LessonViewProps> = ({ lesson, onComplete }) =>
             setAttempts(0);
         }
     }, [stage, activeVariants]); // Add activeVariants dep to ensure it's ready
+
+    if (showIntro && lesson.intro) {
+        return <LessonIntro lesson={lesson} onStart={() => setShowIntro(false)} />;
+    }
 
     const checkCode = () => {
         // Robust normalization using the utility
