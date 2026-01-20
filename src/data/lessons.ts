@@ -101,7 +101,7 @@ export const lessons: Lesson[] = [
       {
         step: 2,
         instruction: "Now update your `{{targetType}}` variable `{{varName}}` to be a new value.",
-        codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  {{targetType}} {{varName}} = ...;\n  // Update {{varName}}\n  \n  return 0;\n}",
+        codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  // Update your variable to a new value\n  \n  return 0;\n}",
         // Context validation: we expect the exact varName they used before.
         // We accept different values based on type? 
         // For simplicity, let's just use a regex that accepts any value assignment to that specific varName (numeric or string literal).
@@ -112,7 +112,7 @@ export const lessons: Lesson[] = [
       {
         step: 3,
         instruction: "Output your variable `{{varName}}` using `cout`.",
-        codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  // Print {{varName}}\n  \n  return 0;\n}",
+        codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  // Print your variable\n  \n  return 0;\n}",
         solution: 'context:cout << {{varName}};',
         hint: "`cout << {{varName}};`"
       }
