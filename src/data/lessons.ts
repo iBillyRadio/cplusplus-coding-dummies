@@ -82,39 +82,30 @@ export const lessons: Lesson[] = [
       exampleCode: "int health = 100;\nstring hero = \"Geralt\";",
       efficiencyTip: "Choosing the smallest type used to matter for memory (like `short` vs `int`), but nowadays for standard logical variables, just use `int`. Processors are optimized for it."
     },
-    variants: {
-      targetType: ['int', 'double', 'string'],
-    },
+    variants: undefined, // Removed randomization requested by user
     previewCode: "int score = 10;\ndouble price = 4.99;\nstring name = \"Player\";",
     stages: [
       {
         step: 1,
-        instruction: "Create a `{{targetType}}` variable with **any name you want** and set it to an initial value.",
-        codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  // Create variable\n  \n  return 0;\n}",
-        // Regex to match: type name = value;
-        // Allows for int x=10; double y = -5.5; string s = "Hello";
-        // Captures 'varName'
-        // We match type exactly, but allow any value (numeric (including negative) or string)
-        solution: 'regex:{{targetType}}\\s+(?<varName>\\w+)\\s*=\\s*(?:-?[\\d\\.]+|"[^"]*")\\s*;',
-        hint: "Follow the pattern: `{{targetType}} name = value;` e.g. `{{targetType}} myVar = ...;`"
+        instruction: "Create an `int` variable named `xp` and set it to `0`.",
+        codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  // Create variable xp\n  \n  return 0;\n}",
+        // Regex strict check for: int xp = 0;
+        solution: 'regex:int\\s+xp\\s*=\\s*0\\s*;',
+        hint: "Type exactly: `int xp = 0;`"
       },
       {
         step: 2,
-        instruction: "Now update your variable to a new value.",
-        codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  // Update your variable to a new value\n  \n  return 0;\n}",
-        // Context validation: we expect the exact varName they used before.
-        // We accept different values based on type? 
-        // For simplicity, let's just use a regex that accepts any value assignment to that specific varName (numeric or string literal).
-        // Matches: name = 50;  or name = "Updated";
-        solution: 'regex:\\w+\\s*=\\s*(?:-?[\\d\\.]+|"[^"]*")\\s*;',
-        hint: "Just use `variable_name = new_value;`."
+        instruction: "Now update `xp` to be `10`.",
+        codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  int xp = 0;\n  // Update xp\n  \n  return 0;\n}",
+        solution: 'regex:xp\\s*=\\s*10\\s*;',
+        hint: "Type exactly: `xp = 10;`"
       },
       {
         step: 3,
-        instruction: "Output your variable using `cout`.",
-        codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  // Print your variable\n  \n  return 0;\n}",
-        solution: 'regex:cout\\s*<<\\s*\\w+\\s*;',
-        hint: "`cout << variable_name;`"
+        instruction: "Output `xp` to the console using `cout`.",
+        codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  int xp = 10;\n  // Print xp\n  \n  return 0;\n}",
+        solution: 'regex:cout\\s*<<\\s*xp\\s*;',
+        hint: "Type exactly: `cout << xp;` (No quotes!)"
       }
     ]
   },
