@@ -143,7 +143,7 @@ export const LessonView: React.FC<LessonViewProps> = ({ lesson, onComplete }) =>
 
             if (nextAttempts >= 2) {
                 // Stronger hint on second attempt
-                message = stage.hint;
+                message = interpolateSolution(stage.hint, { ...activeVariants, ...validationContext });
             } else {
                 // Attempt 1: Gentle nudges based on context (could be improved with specific hint fields later)
                 const mainSolution = Array.isArray(stage.solution) ? stage.solution[0] : stage.solution;

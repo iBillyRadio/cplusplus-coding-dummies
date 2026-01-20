@@ -106,7 +106,7 @@ export const lessons: Lesson[] = [
         // We accept different values based on type? 
         // For simplicity, let's just use a regex that accepts any value assignment to that specific varName (numeric or string literal).
         // Matches: name = 50;  or name = "Updated";
-        solution: 'regex:(?:context:){{varName}}\\s*=\\s*(?:[\\d\\.]+|"[^"]*");',
+        solution: 'regex:{{varName}}\\s*=\\s*(?:[\\d\\.]+|"[^"]*");',
         hint: "Just use `{{varName}} = new_value;`."
       },
       {
