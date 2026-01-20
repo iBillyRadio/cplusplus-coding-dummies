@@ -8,7 +8,12 @@ function App() {
   // Load state from local storage or default to 0
   const [currentLessonIndex, setCurrentLessonIndex] = useState(() => {
     const saved = localStorage.getItem('currentLessonIndex');
-    return saved ? parseInt(saved, 10) : 0;
+    const parsed = saved ? parseInt(saved, 10) : 0;
+    // Safety check: ensure index is within bounds (prevents crash if lessons removed)
+    if (isNaN(parsed) || parsed < 0 || parsed >= lessons.length) {
+      return 0;
+    }
+    return parsed;
   });
 
   const [unlockedLessonIndex, setUnlockedLessonIndex] = useState(() => {

@@ -11,6 +11,9 @@ interface LessonViewProps {
 }
 
 export const LessonView: React.FC<LessonViewProps> = ({ lesson, onComplete }) => {
+    if (!lesson) {
+        return <div className="p-8 text-white">Loading lesson... (or lesson data is missing)</div>;
+    }
     const [currentStageIndex, setCurrentStageIndex] = useState(0);
     const [showIntro, setShowIntro] = useState(false);
     const [code, setCode] = useState('');

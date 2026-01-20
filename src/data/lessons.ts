@@ -89,24 +89,24 @@ export const lessons: Lesson[] = [
     stages: [
       {
         step: 1,
-        instruction: "Create a `{{targetType}}` variable with **any name you want** and set it to a standard value (0, 0.0, or empty string).",
+        instruction: "Create a `{{targetType}}` variable with **any name you want** and set it to an initial value.",
         codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  // Create {{targetType}} variable\n  \n  return 0;\n}",
         // Regex to match: type name = value;
-        // Allows for int x=0; int x = 0; etc.
+        // Allows for int x=10; double y = 5.5; string s = "Hello";
         // Captures 'varName'
-        // For string, we accept "" (empty string).
-        solution: 'regex:{{targetType}}\\s+(?<varName>\\w+)\\s*=\\s*(?:0|0\\.0|"");',
-        hint: "Follow the pattern: `type name = value;` e.g. `int xp = 0;`"
+        // We match type exactly, but allow any value (numeric or string)
+        solution: 'regex:{{targetType}}\\s+(?<varName>\\w+)\\s*=\\s*(?:[\\d\\.]+|"[^"]*");',
+        hint: "Follow the pattern: `{{targetType}} name = value;` e.g. `{{targetType}} myVar = ...;`"
       },
       {
         step: 2,
-        instruction: "Now update your `{{targetType}}` variable `{{varName}}` to be a new value (50, 50.5, or \"Updated\").",
+        instruction: "Now update your `{{targetType}}` variable `{{varName}}` to be a new value.",
         codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  {{targetType}} {{varName}} = ...;\n  // Update {{varName}}\n  \n  return 0;\n}",
         // Context validation: we expect the exact varName they used before.
         // We accept different values based on type? 
         // For simplicity, let's just use a regex that accepts any value assignment to that specific varName (numeric or string literal).
         // Matches: name = 50;  or name = "Updated";
-        solution: 'regex:(?:context:){{varName}}\\s*=\\s*(?:50|50\\.5|"[^"]*");',
+        solution: 'regex:(?:context:){{varName}}\\s*=\\s*(?:[\\d\\.]+|"[^"]*");',
         hint: "Just use `{{varName}} = new_value;`."
       },
       {
