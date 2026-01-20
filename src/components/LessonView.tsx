@@ -78,15 +78,20 @@ export const LessonView: React.FC<LessonViewProps> = ({ lesson, onComplete }) =>
     }, [currentStageIndex, lesson.id]);
 
     // Reset when stage changes
+    // Reset or update template when stage changes
     useEffect(() => {
         if (stage) {
             // Resolve template with current context/variants
             const resolvedTemplate = interpolateSolution(stage.codeTemplate, { ...activeVariants, ...validationContext });
+            // Only update code if it matches the previous stage's template (user hasn't typed custom stuff they want to keep?)
+            // OR if we want to force the new template. 
+            // For this app, each stage usually builds on the previous, but the template includes the previous code + new comments.
+            // So we should overwrite 'code' with the new template which effectively includes the previous answer + new todo.
             setCode(resolvedTemplate);
             setFeedback({ type: 'idle', message: '' });
             setAttempts(0);
         }
-    }, [stage, activeVariants]); // Add activeVariants dep to ensure it's ready
+    }, [stage, activeVariants, validationContext]);
 
     if (showIntro && lesson.intro) {
         return <LessonIntro lesson={lesson} onStart={() => setShowIntro(false)} />;
