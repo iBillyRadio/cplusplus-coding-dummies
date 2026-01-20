@@ -176,7 +176,7 @@ export const lessons: Lesson[] = [
         step: 3,
         instruction: "Compound Logic: Check if `level` > 5 AND `key` is true. Use `&&`. If so, print 'Enter'.",
         codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  int level = 10; bool key = true;\n  // Check both\n  \n  return 0;\n}",
-        solution: 'regex:if\\s*\\(\\s*((level\\s*>\\s*5\\s*&&\\s*key)|(key\\s*&&\\s*level\\s*>\\s*5))\\s*\\)\\s*\\{?\\s*cout\\s*<<\\s*"Enter"\\s*;?\\s*\\}?',
+        solution: 'regex:if\\s*\\(\\s*((level\\s*>\\s*5\\s*&&\\s*key(?:\\s*==\\s*true)?)|(key(?:\\s*==\\s*true)?\\s*&&\\s*level\\s*>\\s*5))\\s*\\)\\s*\\{?\\s*cout\\s*<<\\s*"Enter"\\s*;?\\s*\\}?',
         hint: "`if (A && B) { ... }`"
       }
     ]
