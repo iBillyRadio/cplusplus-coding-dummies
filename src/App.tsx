@@ -68,6 +68,7 @@ function App() {
       onSelectLesson={setCurrentLessonIndex}
     >
       <LessonView
+        key={currentLessonIndex}
         lesson={lessons[currentLessonIndex]}
         onComplete={handleLessonComplete}
       />

@@ -90,7 +90,7 @@ export const lessons: Lesson[] = [
       {
         step: 1,
         instruction: "Create a `{{targetType}}` variable with **any name you want** and set it to an initial value.",
-        codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  // Create {{targetType}} variable\n  \n  return 0;\n}",
+        codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  // Create variable\n  \n  return 0;\n}",
         // Regex to match: type name = value;
         // Allows for int x=10; double y = 5.5; string s = "Hello";
         // Captures 'varName'

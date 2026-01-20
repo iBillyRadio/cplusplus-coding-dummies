@@ -16,55 +16,60 @@ export const LessonView: React.FC<LessonViewProps> = ({ lesson, onComplete }) =>
     }
     const [currentStageIndex, setCurrentStageIndex] = useState(0);
     const [showIntro, setShowIntro] = useState(false);
-    const [code, setCode] = useState('');
+    const [currentStageIndex, setCurrentStageIndex] = useState(0);
+    const [showIntro, setShowIntro] = useState(false);
+    // code state moved to lazy init below
     const [feedback, setFeedback] = useState<{ type: 'success' | 'error' | 'idle'; message: string }>({ type: 'idle', message: '' });
     const [attempts, setAttempts] = useState(0);
 
-    // Flexible Validation State
-    const [validationContext, setValidationContext] = useState<Record<string, string>>({});
-    const [activeVariants, setActiveVariants] = useState<Record<string, string>>({});
+    // Flexible Validation State - Initialize lazily to ensure it's available on first render
+    const [activeVariants, setActiveVariants] = useState<Record<string, string>>(() => {
+        if (lesson.variants) {
+            const variants: Record<string, string> = {};
+            for (const key in lesson.variants) {
+                const options = lesson.variants[key];
+                variants[key] = options[Math.floor(Math.random() * options.length)];
+            }
+            return variants;
+        }
+        return {};
+    });
+
+    // Also Initialize context with variants immediately
+    const [validationContext, setValidationContext] = useState<Record<string, string>>(activeVariants);
 
     const stage = lesson.stages[currentStageIndex];
 
-    // Reset or Restore when lesson changes
+    // Initialize code with interpolated variants immediately
+    const [code, setCode] = useState(() => {
+        const rawTemplate = lesson.stages[0].codeTemplate;
+        return interpolateSolution(rawTemplate, activeVariants);
+    });
+
+    // Reset or Restore when lesson changes (only for localStorage restoration now, init is handled by key remount)
     useEffect(() => {
         const savedStage = localStorage.getItem(`lesson_stage_${lesson.id}`);
-        let initialStage = 0;
-
         if (savedStage) {
             const parsed = parseInt(savedStage, 10);
             if (!isNaN(parsed) && parsed >= 0 && parsed < lesson.stages.length) {
-                initialStage = parsed;
+                setCurrentStageIndex(parsed);
+                // If we restored a stage > 0, we might need to update code to that stage's template?
+                // For now, simple behavior: start at 0 or saved stage.
+                // If saved stage is found, we should probably update 'code' to match that stage's template?
+                // But user might have had custom code. LocalStorage persistence for CODE is not yet implemented, only stage index.
+                // So resetting to template is correct behavior for now.
             }
         }
-
-        setCurrentStageIndex(initialStage);
 
         // Show intro if we are at the beginning and the lesson has one
-        setShowIntro(initialStage === 0 && !!lesson.intro);
+        setShowIntro(currentStageIndex === 0 && !!lesson.intro);
 
-        // Initialize Variants (Randomization)
-        let currentVariants: Record<string, string> = {};
-        if (lesson.variants) {
-            for (const key in lesson.variants) {
-                const options = lesson.variants[key];
-                currentVariants[key] = options[Math.floor(Math.random() * options.length)];
-            }
-            setActiveVariants(currentVariants);
-            // Also reset context on new lesson
-            setValidationContext(currentVariants);
-        } else {
-            setActiveVariants({});
-            setValidationContext({});
-        }
+        // Code is already init by useState lazy init for stage 0. 
+        // If we restored to stage > 0, we might want to update code effectively?
+        // Let's rely on the user to write code or 'Reset Code' if they are midway.
+        // Actually, if we restore stage, we should probably restore the template for THAT stage if code is empty?
+        // But 'code' state is already init to stage 0 template.
 
-        // Resolve template with current context/variants logic immediately for initial render
-        const rawTemplate = lesson.stages[initialStage].codeTemplate;
-        const resolvedTemplate = interpolateSolution(rawTemplate, currentVariants);
-        setCode(resolvedTemplate);
-
-        setFeedback({ type: 'idle', message: '' });
-        setAttempts(0);
     }, [lesson]);
 
     // Save progress
