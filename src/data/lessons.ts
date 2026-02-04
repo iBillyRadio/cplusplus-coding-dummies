@@ -455,7 +455,7 @@ export const lessons: Lesson[] = [
         step: 3,
         instruction: "Check Exists: Check if \"banana\" is in the map using `.count()`.",
         codeTemplate: "#include <iostream>\n#include <map>\nusing namespace std;\n\nint main() {\n  map<string, int> counts;\n  // if banana is in map...\n  return 0;\n}",
-        solution: 'if (counts.count("banana") > 0)',
+        solution: 'regex:if\\s*\\(\\s*counts\\.count\\("banana"\\)(?:\\s*>\\s*0)?\\s*\\)',
         hint: "`.count(key)` returns 1 if found, 0 if not.",
         previewCode: "if (m.count(\"k\"))"
       }
