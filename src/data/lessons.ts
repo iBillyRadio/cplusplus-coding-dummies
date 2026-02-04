@@ -162,21 +162,21 @@ export const lessons: Lesson[] = [
         step: 1,
         instruction: "If `health` is 0, print 'Game Over'.",
         codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  int health = 0;\n  // Check health\n  \n  return 0;\n}",
-        solution: 'regex:if\\s*\\(\\s*health\\s*==\\s*0\\s*\\)\\s*\\{?\\s*cout\\s*<<\\s*"Game Over"\\s*;?\\s*\\}?',
+        solution: 'regex:if\\s*\\(\\s*health\\s*==\\s*0\\s*\\)\\s*\\{[\\s\\S]*?cout\\s*<<\\s*"Game Over"\\s*;?[\\s\\S]*?\\}?',
         hint: "Comparison uses `==`. `if (health == 0) { ... }`"
       },
       {
         step: 2,
         instruction: "Else logic: If `coins` is greater than 10, print 'Rich', otherwise print 'Poor'.",
         codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  int coins = 5;\n  // Logical check\n  \n  return 0;\n}",
-        solution: 'regex:if\\s*\\(\\s*coins\\s*>\\s*10\\s*\\)\\s*\\{?\\s*cout\\s*<<\\s*"Rich"\\s*;?\\s*\\}?\\s*else\\s*\\{?\\s*cout\\s*<<\\s*"Poor"\\s*;?\\s*\\}?',
+        solution: 'regex:if\\s*\\(\\s*coins\\s*>\\s*10\\s*\\)\\s*\\{[\\s\\S]*?cout\\s*<<\\s*"Rich"\\s*;?[\\s\\S]*?\\}?[\\s\\S]*?else[\\s\\S]*?\\{[\\s\\S]*?cout\\s*<<\\s*"Poor"\\s*;?[\\s\\S]*?\\}?',
         hint: "`if (cond) { } else { }`"
       },
       {
         step: 3,
         instruction: "Compound Logic: Check if `level` > 5 AND `key` is true. Use `&&`. If so, print 'Enter'.",
         codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  int level = 10; bool key = true;\n  // Check both\n  \n  return 0;\n}",
-        solution: 'regex:if\\s*\\(\\s*((level\\s*>\\s*5\\s*&&\\s*key(?:\\s*==\\s*true)?)|(key(?:\\s*==\\s*true)?\\s*&&\\s*level\\s*>\\s*5))\\s*\\)\\s*\\{?\\s*cout\\s*<<\\s*"Enter"\\s*;?\\s*\\}?',
+        solution: 'regex:if\\s*\\(\\s*((level\\s*>\\s*5\\s*&&\\s*key(?:\\s*==\\s*true)?)|(key(?:\\s*==\\s*true)?\\s*&&\\s*level\\s*>\\s*5))\\s*\\)\\s*\\{[\\s\\S]*?cout\\s*<<\\s*"Enter"\\s*;?[\\s\\S]*?\\}?',
         hint: "`if (A && B) { ... }`"
       }
     ]
@@ -198,7 +198,7 @@ export const lessons: Lesson[] = [
         step: 1,
         instruction: "Write a standard `for` loop from 0 to 9 (10 times). Print `i`.",
         codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  // Loop 0 to 9\n  \n  return 0;\n}",
-        solution: 'regex:for\\s*\\(\\s*int\\s+(\\w+)\\s*=\\s*0\\s*;\\s*\\1\\s*<\\s*10\\s*;\\s*\\1\\+\\+\\s*\\)\\s*\\{\\s*cout\\s*<<\\s*\\1\\s*;\\s*\\}',
+        solution: 'regex:for\\s*\\(\\s*int\\s+(\\w+)\\s*=\\s*0\\s*;\\s*\\1\\s*<\\s*10\\s*;\\s*\\1\\+\\+\\s*\\)\\s*\\{[\\s\\S]*?cout\\s*<<\\s*\\1\\s*;[\\s\\S]*?\\}',
         hint: "`for (int i = 0; i < N; i++)`"
       },
       {
@@ -212,7 +212,7 @@ export const lessons: Lesson[] = [
         step: 3,
         instruction: "While Loop: Run while `fuel > 0`. Inside, print the **variable** `fuel` (no quotes!), then decrease `fuel` by 1.",
         codeTemplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n  int fuel = 10;\n  while (fuel > 0) {\n     // 1. Print variable 'fuel' (e.g. cout << fuel)\n     // 2. Decrement 'fuel'\n  }\n  return 0;\n}",
-        solution: 'regex:cout\\s*<<\\s*fuel\\s*;\\s*(fuel\\s*--|--\\s*fuel|fuel\\s*-=\\s*1|fuel\\s*=\\s*fuel\\s*-\\s*1)\\s*;',
+        solution: 'regex:cout\\s*<<\\s*fuel\\s*;[\\s\\S]*?(fuel\\s*--|--\\s*fuel|fuel\\s*-=\\s*1|fuel\\s*=\\s*fuel\\s*-\\s*1)\\s*;',
         hint: "Make sure you don't use quotes around `fuel`! Using quotes prints the word, not the number."
       }
     ]
@@ -323,9 +323,9 @@ export const lessons: Lesson[] = [
       },
       {
         step: 2,
-        instruction: "Parameters: Complete the `add` function to return `include a + b`.",
+        instruction: "Parameters: Complete the `add` function to return `a + b`.",
         codeTemplate: "#include <iostream>\nusing namespace std;\n\nint add(int a, int b) {\n  // Return the sum\n}\n\nint main() {\n  cout << add(5, 10);\n  return 0;\n}",
-        solution: 'regex:int\\s+add\\s*\\(\\s*int\\s+(\\w+)\\s*,\\s*int\\s+(\\w+)\\s*\\)\\s*\\{\\s*return\\s+\\1\\s*\\+\\s*\\2\\s*;\\s*\\}',
+        solution: 'regex:int\\s+add\\s*\\(\\s*int\\s+(\\w+)\\s*,\\s*int\\s+(\\w+)\\s*\\)\\s*\\{[\\s\\S]*?return\\s+\\1\\s*\\+\\s*\\2\\s*;\\s*\\}',
         hint: "Use `return a + b;`",
         previewCode: "int sum(int a, int b) { return a+b; }"
       },
